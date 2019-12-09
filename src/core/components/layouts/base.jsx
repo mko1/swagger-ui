@@ -1,7 +1,27 @@
 import React from "react"
 import PropTypes from "prop-types"
+import MuiTreeView from 'material-ui-treeview';
+import YAML from 'yamljs';
+
+import testing_ from '../../../../dev-helpers/testing.yaml';
+
 
 export default class BaseLayout extends React.Component {
+
+  constructor(props, context) {
+    super(props, context)
+    this.state = { url: props.specSelectors.url(), selectedIndex: 0 }
+  }
+
+  downloadUrl = (e) => {
+    this.loadSpec(this.state.url)
+    e.preventDefault()
+  }
+
+  loadSpec = (url) => {
+    this.props.specActions.updateUrl(url)
+    this.props.specActions.download(url)
+  }
 
   static propTypes = {
     errSelectors: PropTypes.object.isRequired,
@@ -28,6 +48,9 @@ export default class BaseLayout extends React.Component {
     const SchemesContainer = getComponent("SchemesContainer", true)
     const AuthorizeBtnContainer = getComponent("AuthorizeBtnContainer", true)
     const FilterContainer = getComponent("FilterContainer", true)
+    const testing = testing_
+
+
     let isSwagger2 = specSelectors.isSwagger2()
     let isOAS3 = specSelectors.isOAS3()
 
@@ -69,12 +92,65 @@ export default class BaseLayout extends React.Component {
       loadingMessage = <h4>No API definition provided.</h4>
     }
 
+    function commitSpec(filename) {
+      console.log('The link was clicked.');
+      window["SwaggerUIBundle"] = window["swagger-ui-bundle"]
+      window["SwaggerUIStandalonePreset"] = window["swagger-ui-standalone-preset"]
+
+      filename = filename.split('.').slice(0, -1).join('.')
+      console.log(filename)
+      var spec_ = eval(filename);
+
+      console.log(spec_)
+      
+      // Convert yaml to json
+      var nativeObject = YAML.parse(spec_);
+
+      // Build a system
+      const ui = SwaggerUIBundle({
+        spec: nativeObject,
+        dom_id: '#swagger-ui',
+        presets: [
+          SwaggerUIBundle.presets.apis,
+          SwaggerUIStandalonePreset
+        ],
+        plugins: [
+          SwaggerUIBundle.plugins.DownloadUrl
+        ],
+        layout: "StandaloneLayout"
+      })
+
+      window.ui = ui
+
+      ui.initOAuth({
+        clientId: "your-client-id",
+        clientSecret: "your-client-secret-if-required",
+        realm: "your-realms",
+        appName: "your-app-name",
+        scopeSeparator: " ",
+        additionalQueryStringParams: {},
+        usePkceWithAuthorizationCodeGrant: false
+      })
+    }
+    
+    function handleSpecs(e) {
+      console.log(e.value)
+      commitSpec(e.value)
+    }
+
     if(loadingMessage) {
-      return <div className="swagger-ui">
-        <div className="loading-container">
-          {loadingMessage}
-        </div>
-      </div>
+      // return (<div className="swagger-ui">
+      //   <div className="loading-container">
+      //     {loadingMessage}
+      //   </div>
+      // </div>)
+
+      return (<div className="swagger-ui">
+         <div className="loading-container">
+            <MuiTreeView defaultExpanded onLeafClick={handleSpecs} tree={specStructures} />
+         </div>
+       </div>
+      )
     }
 
     const servers = specSelectors.servers()
