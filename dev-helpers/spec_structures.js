@@ -8,7 +8,8 @@ var specStructures = [
         value: 'petstore.yaml',
       },  
       {
-        value: 'testing.yaml',
+        value: 'Specis',
+        nodes: [{ value: 'testing.yaml' }, { value: 'Child B' }],
       },  
       {
         value: 'Parent B',
