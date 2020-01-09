@@ -42,6 +42,10 @@ export default class Topbar extends React.Component {
     e.preventDefault()
   }
 
+  reload = (e) => {
+    window.location.reload();
+  }
+
   setSearch = (spec) => {
     let search = parseSearch()
     search["urls.primaryName"] = spec.name
@@ -137,7 +141,7 @@ export default class Topbar extends React.Component {
         <div className="wrapper">
           <div className="topbar-wrapper">
             <Link>
-              <img height="40" src={ Logo } alt="Swagger UI"/>
+              <img height="40" src={ Logo } alt="Swagger UI" onClick={ this.reload }/>
             </Link>
             <form className="download-url-wrapper" onSubmit={formOnSubmit}>
               {control.map((el, i) => cloneElement(el, { key: i }))}

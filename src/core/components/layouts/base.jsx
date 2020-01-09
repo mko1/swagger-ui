@@ -147,7 +147,7 @@ export default class BaseLayout extends React.Component {
 
       return (<div className="swagger-ui">
          <div className="loading-container">
-            <MuiTreeView defaultExpanded onLeafClick={handleSpecs} tree={specStructures} />
+            <MuiTreeView defaultExpanded onLeafClick={handleSpecs} tree={specStructures}/>
          </div>
        </div>
       )
